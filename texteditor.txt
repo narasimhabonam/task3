@@ -1,0 +1,124 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.*;
+
+public class TextEditor extends JFrame {
+    private JTextArea textArea;
+    private JFileChooser fileChooser;
+    
+    public TextEditor() {
+        setTitle("Simple Text Editor");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        
+        textArea = new JTextArea();
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        add(scrollPane);
+        
+       
+        JMenuBar menuBar = new JMenuBar();
+        
+      
+        JMenu fileMenu = new JMenu("File");
+        fileMenu.setMnemonic(KeyEvent.VK_F);
+        
+      
+        JMenuItem newMenuItem = new JMenuItem("New");
+        newMenuItem.setMnemonic(KeyEvent.VK_N);
+        newMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                textArea.setText("");
+            }
+        });
+        
+        
+        JMenuItem openMenuItem = new JMenuItem("Open");
+        openMenuItem.setMnemonic(KeyEvent.VK_O);
+        openMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openFile();
+            }
+        });
+        
+      
+        JMenuItem saveMenuItem = new JMenuItem("Save");
+        saveMenuItem.setMnemonic(KeyEvent.VK_S);
+        saveMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveFile();
+            }
+        });
+        
+       
+        JMenuItem exitMenuItem = new JMenuItem("Exit");
+        exitMenuItem.setMnemonic(KeyEvent.VK_X);
+        exitMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        
+        
+        fileMenu.add(newMenuItem);
+        fileMenu.add(openMenuItem);
+        fileMenu.add(saveMenuItem);
+        fileMenu.addSeparator();
+        fileMenu.add(exitMenuItem);
+        
+        
+        menuBar.add(fileMenu);
+        
+       
+        setJMenuBar(menuBar);
+        
+        fileChooser = new JFileChooser();
+        
+        
+        setLocationRelativeTo(null);
+    }
+    
+    private void openFile() {
+        int returnValue = fileChooser.showOpenDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            try {
+                File file = fileChooser.getSelectedFile();
+                BufferedReader br = new BufferedReader(new FileReader(file));
+                String line;
+                textArea.setText(""); // Clear the text area
+                while ((line = br.readLine()) != null) {
+                    textArea.append(line + "\n");
+                }
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    private void saveFile() {
+        int returnValue = fileChooser.showSaveDialog(this);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            try {
+                File file = fileChooser.getSelectedFile();
+                BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+                bw.write(textArea.getText());
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                new TextEditor().setVisible(true);
+            }
+        });
+    }
+}
